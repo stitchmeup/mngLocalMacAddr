@@ -33,23 +33,19 @@ class GenMacAddr:
 
     def get_addr(self):
         """
-        Returns the _addr object that contains two properties:
+        Return the _addr object that contains two properties:
         - vendorId: list of the 3 most significant bytes of MAC address;
         - serialId: list of the 3 least significant bytes.
         """
         return self._addr
 
     def get_vendorId(self):
-        """ Gets vendor Id """
+        """ Get vendor Id """
         return self._addr['vendorId']
 
     def get_serialId(self):
-        """ Gets vendor Id """
+        """ Get vendor Id """
         return self._addr['serialId']
-
-    def isEmpty(self):
-        """ Return true if vendor Id and serial Id are empty """
-        return not bool(self.get_vendorId()) or bool(self.get_serialId())
 
     @classmethod
     def get_specialVendorId(cls):
@@ -58,7 +54,7 @@ class GenMacAddr:
 
     def set_vendorId(self, id):
         """
-        Sets the vendor Id of the MAC addr
+        Set the vendor Id of the MAC addr
         from the 3 first elements of list of Integers.
         """
         if type(id) is list:
@@ -71,7 +67,7 @@ class GenMacAddr:
 
     def set_serialId(self, id):
         """
-        Sets the serial Id of the MAC addr
+        Set the serial Id of the MAC addr
         from the 3 first elements of list of Integers.
         """
         if type(id) is list:
@@ -84,12 +80,16 @@ class GenMacAddr:
 
     def set_addr(self, addr):
         """
-        Sets the _addr object from addr object that has two properties:
+        Set the _addr object from addr object that has two properties:
         - vendorId: list of Integers;
         - serialId: list of Integers.
         """
         self.set_vendorId(addr['vendorId'][:3])
         self.set_serialId(addr['serialId'][:3])
+
+    def isEmpty(self):
+        """ Return true if vendor Id and serial Id are empty """
+        return not (bool(self.get_vendorId()) and bool(self.get_serialId()))
 
     def toString(self, separator=''):
         """
@@ -110,7 +110,7 @@ class GenMacAddr:
     # https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.ioaz100/canon.htm
     def _generate(self, vendor="LAA"):
         """
-        Generates a random MAC Address.
+        Generate a random MAC Address.
         Use vendor to select vendors (see get_specialVendorId() class method).
         By default, generates a Locally Administered Address (vendor="LAA").
         """
@@ -136,7 +136,7 @@ class GenMacAddr:
     @classmethod
     def toMacAddr(cls, macAsStr, separator=None):
         """
-        Returns a MacAddr objct from a MAC address as a string.
+        Return a MacAddr objct from a MAC address as a string.
         Use separator to specify theseparator of the bytes in the given string.
         """
         # Check integrity
@@ -173,8 +173,11 @@ class GenMacAddr:
 if __name__ == '__main__':
     strng = GenMacAddr().toString()
     macaddr = GenMacAddr.toMacAddr(strng).toString()
+    # true
     print(strng == macaddr)
     emptyMac = GenMacAddr(None)
+    # true
     print(emptyMac.isEmpty())
     emptyMac.set_vendorId([1, 1, 1])
+    # true
     print(emptyMac.isEmpty())
