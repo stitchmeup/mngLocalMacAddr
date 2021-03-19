@@ -24,6 +24,7 @@ class MngMacDB(sqlite3.Connection):
         self._patternModes = {}
         self._patternModes["mac"] = True
         self._patternModes["hostname"] = True
+        self._safeQuery = True
         self._tables = []
         self.set_Tables()
 
@@ -41,6 +42,9 @@ class MngMacDB(sqlite3.Connection):
 
     def get_patternModes(self):
         return self._patternModes
+
+    def get_safeQuery(self):
+        return self._safeQuery
 
     def get_tables(self):
         return self._tables
@@ -98,7 +102,7 @@ class MngMacDB(sqlite3.Connection):
 
     def set_patternModes(self, patternModes):
         """
-        Set patterns mode for mac and hostname
+        Set pattern modes (True or False) for mac and hostname
         modes is an dictionnary with at least 1 property: mac or hostname
         """
         for key in patternModes:
@@ -109,6 +113,17 @@ class MngMacDB(sqlite3.Connection):
                     key,
                     " invalid key. Only 'mac' or 'hostname' allowed."
                 )
+
+    def set_safeQuery(self, isSafe=True):
+        """
+        Enable safe mode query (default True):
+        Can only do INSERT INTO and UPDATE with non pattern mac and/or hostname
+        Without arg, set it to True
+        """
+        if type(isSafe) is bool:
+            self._safeQuery = isSafe
+        else:
+            raise TypeError(isSafe, "is not a boolean.")
 
     def set_Tables(self):
         " Set _tables to a list of existing tables of in database "
@@ -144,11 +159,12 @@ class MngMacDB(sqlite3.Connection):
     # INSERT INTO
     def insert(self, table):
         # Prevent insert with pattern (data corruption)
-        for key in self._patternModes:
-            if self._patternModes[key]:
-                raise ValueError(
-                    "Invalid request. mac or(and) hostname is(are) pattern(s)."
-                )
+        if self._safeQuery:
+            for key in self._patternModes:
+                if self._patternModes[key]:
+                    raise ValueError(
+                        "Invalid request. mac or(and) hostname is(are) pattern(s)."
+                    )
 
         query = 'INSERT INTO {}'.format(table) + \
             '(mac, hostname) VALUES(:mac, :hostname);'
@@ -166,11 +182,12 @@ class MngMacDB(sqlite3.Connection):
         }
         """
         # Prevent update with pattern (data corruption)
-        for key in self._patternModes:
-            if self._patternModes[key]:
-                raise ValueError(
-                    "Invalid request. mac or(and) hostname is(are) pattern(s)."
-                )
+        if self._safeQuery:
+            for key in self._patternModes:
+                if self._patternModes[key]:
+                    raise ValueError(
+                        "Invalid request. mac or(and) hostname is(are) pattern(s)."
+                    )
 
         query = 'UPDATE {}'.format(table) + \
             'SET :updatedCol = :updatedVal' + \
@@ -206,6 +223,7 @@ class MngMacDB(sqlite3.Connection):
 
 
 if __name__ == '__main__':
+    """
     mngMacDB = MngMacDB('mac.db')
     print(mngMacDB.get_tables())
     # ['vbox', 'any']
@@ -247,3 +265,4 @@ if __name__ == '__main__':
 
     print(mngMacDB.select('any'))
     # [('325DB9491B5E', 'host1'), ('2A523B85189F', 'host-2'), ('86A1EC0CB254', 'host-2')]
+    """
