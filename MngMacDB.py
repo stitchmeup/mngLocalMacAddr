@@ -70,14 +70,16 @@ class MngMacDB(sqlite3.Connection):
         else:
             if mac is None:
                 self._mac = '%'
-                self._patternModes["mac"] = False
+                self._patternModes["mac"] = True
             elif isinstance(mac, GenMacAddr):
                 if not mac.isEmpty():
                     self._mac = mac.toString()
                 else:
                     raise ValueError(mac, "mac address is empty.")
             else:
-                raise TypeError(mac, " is not an instance of GenMacAddr.")
+                raise TypeError(mac,
+                                " is not an instance of GenMacAddr class."
+                                )
 
     def set_hostname(self, hostname, patternMode=False):
         """
@@ -139,6 +141,13 @@ class MngMacDB(sqlite3.Connection):
         " Return True if table is in database "
         return True if table in self._tables else False
 
+    def isQueryingSafe(self):
+        if self._safeQuery:
+            for key in self._patternModes:
+                if self._patternModes[key]:
+                    return False
+        return True
+
     # Overrides sqlite3.Connection
     def execute(self, sql, parameter, table):
         if not self.tableExist(table):
@@ -167,7 +176,7 @@ class MngMacDB(sqlite3.Connection):
                     )
 
         query = 'INSERT INTO {}'.format(table) + \
-            '(mac, hostname) VALUES(:mac, :hostname);'
+            ' (mac, hostname) VALUES (:mac, :hostname);'
         return self.execute(query, {
             "mac": self._mac,
             "hostname": self._hostname
@@ -190,8 +199,8 @@ class MngMacDB(sqlite3.Connection):
                     )
 
         query = 'UPDATE {}'.format(table) + \
-            'SET :updatedCol = :updatedVal' + \
-            'WHERE :matchedCol LIKE :matchedVal'
+            ' SET :updatedCol = :updatedVal' + \
+            ' WHERE :matchedCol LIKE :matchedVal;'
         return self.execute(query, {
             "updatedCol": columns.updated.keys()[0],
             "updatedVal": columns.updated.values()[0],
@@ -210,6 +219,19 @@ class MngMacDB(sqlite3.Connection):
             "updated": {"hostname": self._hostname},
             "matched": {"mac": self._mac}
         })
+
+    def delete(self, table):
+        if not self.isQueryingSafe():
+            raise ValueError(
+                "safe mode ON.",
+                "Disable it to use DELETE with a pattern mode ON."
+            )
+        query = 'DELETE FROM {}'.format(table) + \
+            ' WHERE mac LIKE :mac AND hostname LIKE :hostname;'
+        return self.execute(query, {
+            "mac": self._mac,
+            "hostname": self._hostname
+            }, table)
 
     @staticmethod
     def isValidHostname(hostname):
@@ -265,4 +287,12 @@ if __name__ == '__main__':
 
     print(mngMacDB.select('any'))
     # [('325DB9491B5E', 'host1'), ('2A523B85189F', 'host-2'), ('86A1EC0CB254', 'host-2')]
+
+    mngMacDB.set_hostname('hostToDelete', False)
+    macAddr.set_vendorId([0x12, 0x15, 0x5A])
+    mngMacDB.set_mac(macAddr, False)
+    mngMacDB.insert('any')
+    # {'mac': '12155A491B5E', 'hostname': 'hostToDelete'}
+    mngMacDB.delete('any')
+    {'mac': '12155A491B5E', 'hostname': 'hostToDelete'}
     """
