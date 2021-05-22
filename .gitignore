@@ -130,5 +130,5 @@ dmypy.json
 .pyre/
 
 # SQLite
-.db
-.db-journal
+*.db
+*.db-journal
