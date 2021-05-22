@@ -121,6 +121,7 @@ class GenMacAddr:
 
         # Set vendor ID
         if vendor == "LAA":
+            # Setting the two first bits (LSB) of the most significant byte to '10'
             addr['vendorId'].append(random.randrange(0x01, 0x7F, 2) << 1)
             while (len(addr['vendorId']) < 3):
                 addr['vendorId'].append(random.randrange(0x00, 0xFF))

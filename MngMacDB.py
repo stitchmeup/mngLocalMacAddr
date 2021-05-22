@@ -105,7 +105,7 @@ class MngMacDB(sqlite3.Connection):
     def set_patternModes(self, patternModes):
         """
         Set pattern modes (True or False) for mac and hostname
-        modes is an dictionnary with at least 1 property: mac or hostname
+        modes is a dictionnary with at least 1 property: mac or hostname
         """
         for key in patternModes:
             if key in self._patternModes:
@@ -128,7 +128,7 @@ class MngMacDB(sqlite3.Connection):
             raise TypeError(isSafe, "is not a boolean.")
 
     def set_Tables(self):
-        " Set _tables to a list of existing tables of in database "
+        " Set _tables to a list of existing tables in database "
         self._cur.execute(
             "SELECT name FROM sqlite_master WHERE type='table';")
         # Not sure condition in the filtering under is needed
