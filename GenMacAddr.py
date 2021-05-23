@@ -172,6 +172,7 @@ class GenMacAddr:
 
 
 if __name__ == '__main__':
+    """
     strng = GenMacAddr().toString()
     macaddr = GenMacAddr.toMacAddr(strng).toString()
     # true
@@ -182,3 +183,4 @@ if __name__ == '__main__':
     emptyMac.set_vendorId([1, 1, 1])
     # true
     print(emptyMac.isEmpty())
+    """

@@ -113,7 +113,8 @@ class MngMacDB(sqlite3.Connection):
             else:
                 raise ValueError(
                     key,
-                    " invalid key. Only 'mac' or 'hostname' allowed."
+                    " invalid key.\
+                    Only 'mac' or 'hostname' are allowed."
                 )
 
     def set_safeQuery(self, isSafe=True):
@@ -162,24 +163,22 @@ class MngMacDB(sqlite3.Connection):
          ' WHERE mac LIKE :mac AND hostname LIKE :hostname;'
         return self.execute(query, {
             "mac": self._mac,
-            "hostname": self._hostname
+            "hostname": self._hostname,
         }, table)
 
     # INSERT INTO
     def insert(self, table):
         # Prevent insert with pattern (data corruption)
-        if self._safeQuery:
-            for key in self._patternModes:
-                if self._patternModes[key]:
-                    raise ValueError(
-                        "Invalid request. mac or(and) hostname is(are) pattern(s)."
-                    )
+        if self.isQueryingSafe():
+            raise ValueError(
+                "Invalid request. mac or(and) hostname is(are) pattern(s)."
+            )
 
         query = 'INSERT INTO {}'.format(table) + \
             ' (mac, hostname) VALUES (:mac, :hostname);'
         return self.execute(query, {
             "mac": self._mac,
-            "hostname": self._hostname
+            "hostname": self._hostname,
         }, table)
 
     # Update abstract
@@ -191,12 +190,11 @@ class MngMacDB(sqlite3.Connection):
         }
         """
         # Prevent update with pattern (data corruption)
-        if self._safeQuery:
-            for key in self._patternModes:
-                if self._patternModes[key]:
-                    raise ValueError(
-                        "Invalid request. mac or(and) hostname is(are) pattern(s)."
-                    )
+        if self.isQueryingSafe():
+            raise ValueError(
+                "Invalid request.\
+                mac or(and) hostname is(are) pattern(s)."
+            )
 
         query = 'UPDATE {}'.format(table) + \
             ' SET :updatedCol = :updatedVal' + \
@@ -211,7 +209,7 @@ class MngMacDB(sqlite3.Connection):
     def updateMac(self, table):
         return self.update(table, {
             "updated": {"mac": self._mac},
-            "matched": {"hostname": self._hostname},
+            "matched": {"hostname": self._hostname}
         })
 
     def updateHostname(self, table):
@@ -240,12 +238,11 @@ class MngMacDB(sqlite3.Connection):
         if hostname[-1] == ".":
             # strip exactly one dot from the right, if present
             hostname = hostname[:-1]
-        allowed = re.compile("(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
+        allowed = re.compile("(?!-)[A-Z0-9-]{1,63}(?<!-)$", re.IGNORECASE)
         return all(allowed.match(x) for x in hostname.split("."))
 
 
 if __name__ == '__main__':
-    """
     mngMacDB = MngMacDB('mac.db')
     print(mngMacDB.get_tables())
     # ['vbox', 'any']
@@ -272,11 +269,12 @@ if __name__ == '__main__':
     mngMacDB.set_mac(None)
     mngMacDB.set_hostname('host-2')
     print(mngMacDB.select('any'))
-    # [('2A523B85189F', 'host 2'), ('86A1EC0CB254', 'host 2')]
+    # [('2A523B85189F', 'host 2' ), ('86A1EC0CB254', 'host 2')]
 
     mngMacDB.set_hostname('host%', True)
     print(mngMacDB.select('any'))
-    # [('325DB9491B5E', 'host1'), ('2A523B85189F', 'host-2'), ('86A1EC0CB254', 'host-2')]
+    # [('325DB9491B5E', 'host1'), ('2A523B85189F', 'host-2'),
+    # ('86A1EC0CB254', 'host-2')]
 
 
     try:
@@ -286,7 +284,8 @@ if __name__ == '__main__':
     # Invalid request. mac or(and) hostname is(are) pattern(s).
 
     print(mngMacDB.select('any'))
-    # [('325DB9491B5E', 'host1'), ('2A523B85189F', 'host-2'), ('86A1EC0CB254', 'host-2')]
+    # [('325DB9491B5E', 'host1'), ('2A523B85189F', 'host-2'),
+    # ('86A1EC0CB254', 'host-2')]
 
     mngMacDB.set_hostname('hostToDelete', False)
     macAddr.set_vendorId([0x12, 0x15, 0x5A])
@@ -295,4 +294,3 @@ if __name__ == '__main__':
     # {'mac': '12155A491B5E', 'hostname': 'hostToDelete'}
     mngMacDB.delete('any')
     {'mac': '12155A491B5E', 'hostname': 'hostToDelete'}
-    """
