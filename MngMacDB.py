@@ -153,7 +153,6 @@ class MngMacDB(sqlite3.Connection):
     def execute(self, sql, parameter, table):
         if not self.tableExist(table):
             raise ValueError(table, " does not exist in database.")
-        print(parameter)
         self._cur.execute(sql, parameter)
         return self._cur.fetchall()
 
@@ -169,16 +168,16 @@ class MngMacDB(sqlite3.Connection):
     # INSERT INTO
     def insert(self, table):
         # Prevent insert with pattern (data corruption)
-        if self.isQueryingSafe():
+        if not self.isQueryingSafe():
             raise ValueError(
-                "Invalid request. mac or(and) hostname is(are) pattern(s)."
+                "Invalid query. mac or hostname is a pattern."
             )
 
         query = 'INSERT INTO {}'.format(table) + \
             ' (mac, hostname) VALUES (:mac, :hostname);'
         return self.execute(query, {
             "mac": self._mac,
-            "hostname": self._hostname,
+            "hostname": self._hostname
         }, table)
 
     # Update abstract
@@ -192,8 +191,7 @@ class MngMacDB(sqlite3.Connection):
         # Prevent update with pattern (data corruption)
         if self.isQueryingSafe():
             raise ValueError(
-                "Invalid request.\
-                mac or(and) hostname is(are) pattern(s)."
+                "Invalid query. mac or hostname is a pattern."
             )
 
         query = 'UPDATE {}'.format(table) + \
@@ -222,7 +220,7 @@ class MngMacDB(sqlite3.Connection):
         if not self.isQueryingSafe():
             raise ValueError(
                 "safe mode ON.",
-                "Disable it to use DELETE with a pattern mode ON."
+                "Disable it to use DELETE with a pattern."
             )
         query = 'DELETE FROM {}'.format(table) + \
             ' WHERE mac LIKE :mac AND hostname LIKE :hostname;'
@@ -243,6 +241,7 @@ class MngMacDB(sqlite3.Connection):
 
 
 if __name__ == '__main__':
+    """
     mngMacDB = MngMacDB('mac.db')
     print(mngMacDB.get_tables())
     # ['vbox', 'any']
@@ -269,19 +268,18 @@ if __name__ == '__main__':
     mngMacDB.set_mac(None)
     mngMacDB.set_hostname('host-2')
     print(mngMacDB.select('any'))
-    # [('2A523B85189F', 'host 2' ), ('86A1EC0CB254', 'host 2')]
+    # [('2A523B85189F', 'host-2' ), ('86A1EC0CB254', 'host-2')]
 
     mngMacDB.set_hostname('host%', True)
     print(mngMacDB.select('any'))
     # [('325DB9491B5E', 'host1'), ('2A523B85189F', 'host-2'),
     # ('86A1EC0CB254', 'host-2')]
 
-
     try:
         mngMacDB.insert('any')
     except ValueError as e:
         print(e)
-    # Invalid request. mac or(and) hostname is(are) pattern(s).
+    # Invalid query. mac or hostname is pattern.
 
     print(mngMacDB.select('any'))
     # [('325DB9491B5E', 'host1'), ('2A523B85189F', 'host-2'),
@@ -292,5 +290,12 @@ if __name__ == '__main__':
     mngMacDB.set_mac(macAddr, False)
     mngMacDB.insert('any')
     # {'mac': '12155A491B5E', 'hostname': 'hostToDelete'}
+
+    print(mngMacDB.select('any'))
+    # [('12155A491B5E', 'hostToDelete')]
+
     mngMacDB.delete('any')
-    {'mac': '12155A491B5E', 'hostname': 'hostToDelete'}
+
+    print(mngMacDB.select('any'))
+    # []
+    """
