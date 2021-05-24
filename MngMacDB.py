@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # API to mac address sqlite3 DB
 # SELECT, INSERT, DELETE
 

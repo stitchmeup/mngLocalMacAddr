@@ -133,5 +133,5 @@ dmypy.json
 *.db
 *.db-journal
 
-# Linter PyDocStyle (linter-pydocstyle)
-.pydocstylerc
+# pycodestyle linter
+tox.ini

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+"""Class to handle MAC address and random generation."""
 
 #  class to handle mac address and mac address random generation
 
@@ -7,7 +7,7 @@ import re
 
 
 class GenMacAddr:
-    'Mac Address class'
+    """Mac Address class."""
 
     _specialVendorId = {
         "vbox": [0x08, 0x00, 0x27]
@@ -121,8 +121,7 @@ class GenMacAddr:
 
         # Set vendor ID
         if vendor == "LAA":
-            # Setting the two first bits (LSB) of the most significant byte
-            # to '10'
+            # Setting the two first bits (LSB) of the most significant byte to '10'
             addr['vendorId'].append(random.randrange(0x01, 0x7F, 2) << 1)
             while (len(addr['vendorId']) < 3):
                 addr['vendorId'].append(random.randrange(0x00, 0xFF))
