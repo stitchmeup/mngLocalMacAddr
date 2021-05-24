@@ -133,5 +133,5 @@ dmypy.json
 *.db
 *.db-journal
 
-# Linter
-.csslintrc
+# Linter PyDocStyle (linter-pydocstyle)
+.pydocstylerc
