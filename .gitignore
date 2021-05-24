@@ -132,3 +132,6 @@ dmypy.json
 # SQLite
 *.db
 *.db-journal
+
+# Linter
+.csslintrc

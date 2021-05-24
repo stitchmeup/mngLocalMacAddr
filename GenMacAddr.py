@@ -105,7 +105,7 @@ class GenMacAddr:
     # Generate a list of 6 bytes
     # If no special vendor (i.e VirtualBox) is not provided or unknown,
     # individual locally administered address will be generated randomly,
-    # meaning the two least significant bit of first octet are a 10:
+    # meaning the two least significant bit of first octet are '10':
     # X2XXXXXXXXXX, X6XXXXXXXXXX, XAXXXXXXXXXX, XEXXXXXXXXXX
     # https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.ioaz100/canon.htm
     def _generate(self, vendor="LAA"):
@@ -121,7 +121,8 @@ class GenMacAddr:
 
         # Set vendor ID
         if vendor == "LAA":
-            # Setting the two first bits (LSB) of the most significant byte to '10'
+            # Setting the two first bits (LSB) of the most significant byte
+            # to '10'
             addr['vendorId'].append(random.randrange(0x01, 0x7F, 2) << 1)
             while (len(addr['vendorId']) < 3):
                 addr['vendorId'].append(random.randrange(0x00, 0xFF))
