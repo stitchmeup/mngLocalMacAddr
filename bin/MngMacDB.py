@@ -2,7 +2,7 @@
 # SELECT, INSERT, DELETE
 
 import sqlite3
-from GenMacAddr import GenMacAddr
+from GenMacAddr import GenMacAddr  # type: ignore
 import re
 
 
@@ -17,7 +17,7 @@ class MngMacDB(sqlite3.Connection):
         self._database = database
         self._cur = self.cursor()
         # % Matches any in SQL WHERE condition
-        self._mac = '%'
+        self._macAddr = '%'
         self._hostname = '%'
         self._patternModes = {}
         self._patternModes["mac"] = True
@@ -32,8 +32,8 @@ class MngMacDB(sqlite3.Connection):
     def get_cur(self):
         return self._cur
 
-    def get_mac(self):
-        return self._mac
+    def get_macAddr(self):
+        return self._macAddr
 
     def get_hostname(self):
         return self._hostname
@@ -53,8 +53,9 @@ class MngMacDB(sqlite3.Connection):
         super().__init__(database)
         self._database = database
         self._cur = self.cursor()
+        self.set_tables()
 
-    def set_mac(self, mac, patternMode=False):
+    def set_macAddr(self, mac, patternMode=False):
         """
         Set mac from a GenMacAddr instance
         if None:
@@ -64,14 +65,14 @@ class MngMacDB(sqlite3.Connection):
         """
         self._patternModes["mac"] = patternMode
         if patternMode:
-            self._mac = mac
+            self._macAddr = mac
         else:
             if mac is None:
-                self._mac = '%'
+                self._macAddr = '%'
                 self._patternModes["mac"] = True
             elif isinstance(mac, GenMacAddr):
                 if not mac.isEmpty():
-                    self._mac = mac.toString()
+                    self._macAddr = mac.toString()
                 else:
                     raise ValueError(mac, "mac address is empty.")
             else:
@@ -159,7 +160,7 @@ class MngMacDB(sqlite3.Connection):
         query = 'SELECT * FROM {}'.format(table) + \
             ' WHERE mac LIKE :mac AND hostname LIKE :hostname;'
         return self.execute(query, {
-            "mac": self._mac,
+            "mac": self._macAddr,
             "hostname": self._hostname,
         }, table)
 
@@ -174,7 +175,7 @@ class MngMacDB(sqlite3.Connection):
         query = 'INSERT INTO {}'.format(table) + \
             ' (mac, hostname) VALUES (:mac, :hostname);'
         return self.execute(query, {
-            "mac": self._mac,
+            "mac": self._macAddr,
             "hostname": self._hostname
         }, table)
 
@@ -204,14 +205,14 @@ class MngMacDB(sqlite3.Connection):
 
     def updateMac(self, table):
         return self.update(table, {
-            "updated": {"mac": self._mac},
+            "updated": {"mac": self._macAddr},
             "matched": {"hostname": self._hostname}
         })
 
     def updateHostname(self, table):
         return self.update(table, {
             "updated": {"hostname": self._hostname},
-            "matched": {"mac": self._mac}
+            "matched": {"mac": self._macAddr}
         })
 
     def delete(self, table):
@@ -223,9 +224,19 @@ class MngMacDB(sqlite3.Connection):
         query = 'DELETE FROM {}'.format(table) + \
             ' WHERE mac LIKE :mac AND hostname LIKE :hostname;'
         return self.execute(query, {
-            "mac": self._mac,
+            "mac": self._macAddr,
             "hostname": self._hostname
         }, table)
+
+    def isMacUniq(self):
+        """
+        Determine if mac Addr is already known in specified tables
+        tables must be a list of string.
+        """
+        for table in self.tables:
+            if self.mngMacDB.select(table):
+                return False
+        return True
 
     @staticmethod
     def isValidHostname(hostname):
@@ -259,11 +270,11 @@ if __name__ == '__main__':
         "vendorId": [0x32, 0x5D, 0xB9],
         "serialId": [0x49, 0x1B, 0x5E]
     })
-    mngMacDB.set_mac(macAddr)
+    mngMacDB.set_macAddr(macAddr)
     print(mngMacDB.select('any'))
     # [('325DB9491B5E', 'host1')]
 
-    mngMacDB.set_mac(None)
+    mngMacDB.set_macAddr(None)
     mngMacDB.set_hostname('host-2')
     print(mngMacDB.select('any'))
     # [('2A523B85189F', 'host-2' ), ('86A1EC0CB254', 'host-2')]
@@ -285,7 +296,7 @@ if __name__ == '__main__':
 
     mngMacDB.set_hostname('hostToDelete', False)
     macAddr.set_vendorId([0x12, 0x15, 0x5A])
-    mngMacDB.set_mac(macAddr, False)
+    mngMacDB.set_macAddr(macAddr, False)
     mngMacDB.insert('any')
     # {'mac': '12155A491B5E', 'hostname': 'hostToDelete'}
 

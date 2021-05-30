@@ -3,12 +3,27 @@
 # TODO: initial script comments
 
 import argparse
+import sys
+sys.path.insert(0, 'plugins/actions')
+from generate import Generate  # type: ignore
+from populate import Populate  # type: ignore
+from list import ListRecords  # type: ignore
+from delete import DeleteRecords  # type: ignore
+
+
+# commands functions
+def generate(args):
+    macAddr = Generate(args.hostname, args.vendor, args.database, args.table)
+    print(macAddr.get_macAddr())
+    if not args.noinsert:
+        macAddr.insert(macAddr.get_table())
+
 
 # argparse
 tablesList = ['generic']
 tablesAll = tablesList.copy()
 tablesAll.append('all')
-macAddrType = ['laa', 'vbox']
+macAddrVendor = ['laa', 'vbox']
 
 # TODO: description
 parser = argparse.ArgumentParser(description="TBD")
@@ -29,7 +44,7 @@ parser_populate.add_argument('table', type=str, choices=tablesAll,
 parser_generate = subparsers.add_parser('generate',
                                         help='generate a new MAC address'
                                         )
-parser_generate.add_argument('-t', '--type', type=str, choices=macAddrType,
+parser_generate.add_argument('--vendor', type=str, choices=macAddrVendor,
                              default='laa',
                              help='type of MAC addr: LAA or VBox (default: laa)'
                              )
@@ -40,6 +55,11 @@ parser_generate.add_argument('-T', '--table', type=str, choices=tablesList,
                              default='generic',
                              help='save it in the specified table (default: generic)'
                              )
+parser_generate.add_argument('-n', '--noinsert', action="store_true",
+                             help='Does not insert newly generated mac address into database.\
+                             Overrides --table <table>'
+                             )
+parser_generate.set_defaults(func=generate)
 
 # list
 parser_list = subparsers.add_parser('list',
@@ -74,3 +94,4 @@ parser_delete.add_argument('-H', '--hostname', type=str,
 
 # parse args
 args = parser.parse_args()
+args.func(args)

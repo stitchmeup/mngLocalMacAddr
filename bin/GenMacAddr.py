@@ -13,7 +13,7 @@ class GenMacAddr:
         "vbox": [0x08, 0x00, 0x27]
     }
 
-    def __init__(self, vendor="LAA"):
+    def __init__(self, vendor="laa"):
         """
         Constructor of MAC addr:
         1 property: _addr
@@ -22,14 +22,18 @@ class GenMacAddr:
             - serialId: 3 least significant (left) bytes of the MAC addr.
         Use vendor to specify a special known vendor for vendorID.
         If vendor is None, doesn't generate a MAC address (vendor="None").
-        By default generate a new Locally Administered Address (venor="LAA").
+        By default generate a new Locally Administered Address (venor="laa").
         """
+        self.vendor = vendor
         self._addr = {
             "vendorId": [],
             "serialId": []
         }
         if vendor is not None:
-            self._generate(vendor)
+            self._generate()
+
+    def get_vendor(self):
+        return self.vendor
 
     def get_addr(self):
         """
@@ -51,6 +55,18 @@ class GenMacAddr:
     def get_specialVendorId(cls):
         """ Get dict of special known vendors ID """
         return cls._specialVendorId
+
+    def set_vendor(self, vendor):
+        self.vendor = vendor
+
+    def set_addr(self, addr):
+        """
+        Set the _addr object from addr object that has two properties:
+        - vendorId: list of Integers;
+        - serialId: list of Integers.
+        """
+        self.set_vendorId(addr['vendorId'][:3])
+        self.set_serialId(addr['serialId'][:3])
 
     def set_vendorId(self, id):
         """
@@ -78,15 +94,6 @@ class GenMacAddr:
             raise TypeError(id + " is not a List.")
         self._addr['serialId'] = id[:3]
 
-    def set_addr(self, addr):
-        """
-        Set the _addr object from addr object that has two properties:
-        - vendorId: list of Integers;
-        - serialId: list of Integers.
-        """
-        self.set_vendorId(addr['vendorId'][:3])
-        self.set_serialId(addr['serialId'][:3])
-
     def isEmpty(self):
         """ Return true if vendor Id and serial Id are empty """
         return not (bool(self.get_vendorId()) and bool(self.get_serialId()))
@@ -108,11 +115,11 @@ class GenMacAddr:
     # meaning the two least significant bit of first octet are '10':
     # X2XXXXXXXXXX, X6XXXXXXXXXX, XAXXXXXXXXXX, XEXXXXXXXXXX
     # https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.ioaz100/canon.htm
-    def _generate(self, vendor="LAA"):
+    def _generate(self):
         """
         Generate a random MAC Address.
         Use vendor to select vendors (see get_specialVendorId() class method).
-        By default, generates a Locally Administered Address (vendor="LAA").
+        By default, generates a Locally Administered Address (vendor="laa").
         """
         addr = {
             "vendorId": [],
@@ -120,13 +127,15 @@ class GenMacAddr:
         }
 
         # Set vendor ID
-        if vendor == "LAA":
+        if self.vendor == "laa":
             # Setting the two first bits (LSB) of the most significant byte to '10'
             addr['vendorId'].append(random.randrange(0x01, 0x7F, 2) << 1)
             while (len(addr['vendorId']) < 3):
                 addr['vendorId'].append(random.randrange(0x00, 0xFF))
-        elif vendor in GenMacAddr._specialVendorId:
-            addr['vendorId'] = GenMacAddr._specialVendorId[vendor]
+        elif self.vendor in GenMacAddr._specialVendorId:
+            addr['vendorId'] = GenMacAddr._specialVendorId[self.vendor]
+        else:
+            raise ValueError(self.vendor, "not found.")
 
         # Set serial ID
         while (len(addr['serialId']) < 3):
@@ -147,7 +156,7 @@ class GenMacAddr:
         # if not separator: pretty much the same in this context?
         if separator is None or separator == "":
             n = 2
-            bytesList = [int(macAsStr[i:i+n], 16)
+            bytesList = [int(macAsStr[i:i + n], 16)
                          for i in range(0, len(macAsStr), n)
                          ]
         else:
