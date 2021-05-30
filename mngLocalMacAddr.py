@@ -40,9 +40,6 @@ parser_generate.add_argument('-T', '--table', type=str, choices=tablesList,
                              default='generic',
                              help='save it in the specified table (default: generic)'
                              )
-parser_generate.add_argument('-V', '--vagrant', metavar='ADAPTER', type=int,
-                             help='Modify VagrantFile in working directory if present, setting MAC address for the selected adapter (must be already defined in VagrantFile)'
-                             )
 
 # list
 parser_list = subparsers.add_parser('list',

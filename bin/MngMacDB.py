@@ -134,7 +134,7 @@ class MngMacDB(sqlite3.Connection):
         self._tables = [
             table[0] for table in self._cur.fetchall()
             if table[0] != "sqlite_sequence"
-            ]
+        ]
 
     def tableExist(self, table):
         " Return True if table is in database "
@@ -157,7 +157,7 @@ class MngMacDB(sqlite3.Connection):
     # SELECT
     def select(self, table):
         query = 'SELECT * FROM {}'.format(table) + \
-         ' WHERE mac LIKE :mac AND hostname LIKE :hostname;'
+            ' WHERE mac LIKE :mac AND hostname LIKE :hostname;'
         return self.execute(query, {
             "mac": self._mac,
             "hostname": self._hostname,
@@ -225,7 +225,7 @@ class MngMacDB(sqlite3.Connection):
         return self.execute(query, {
             "mac": self._mac,
             "hostname": self._hostname
-            }, table)
+        }, table)
 
     @staticmethod
     def isValidHostname(hostname):
