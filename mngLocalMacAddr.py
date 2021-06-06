@@ -3,12 +3,10 @@
 # TODO: initial script comments
 
 import argparse
-import sys
-sys.path.insert(0, 'plugins/actions')
-from generate import Generate  # type: ignore
-from populate import Populate  # type: ignore
-from list import ListRecords  # type: ignore
-from delete import DeleteRecords  # type: ignore
+from src.plugins.actions.generate import Generate  # type: ignore
+from src.plugins.actions.generate.populate import Populate  # type: ignore
+from src.plugins.actions.generate.list import ListRecords  # type: ignore
+from src.plugins.actions.generate.delete import DeleteRecords  # type: ignore
 
 
 # commands functions
