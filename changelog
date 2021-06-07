@@ -1,0 +1,19 @@
+## 03/19/21
+# MngMacDB:
+- Implements SELECT, INSERT INTO and UPDATE SQLite request
+- Prevented data corruption with INSERT INTO, UPDATE and DELETE (via pattern enabling modes and safeQuery mode)
+- method isValidHostname
+- method isQueryingSafe
+
+## 06/06/21
+# File structure
+- Reworked file structure (python package)
+- Added src folder
+- Added setup.cfg
+# mngLocalMacAddr
+- Created CLI program to interface with
+# bin
+- Finishe MngMacDB
+- Bug fix
+# pluging.actions
+- Created actions called by CLI program
