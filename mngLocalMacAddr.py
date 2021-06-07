@@ -3,18 +3,26 @@
 # TODO: initial script comments
 
 import argparse
-from src.plugins.actions.generate import Generate  # type: ignore
-from src.plugins.actions.generate.populate import Populate  # type: ignore
-from src.plugins.actions.generate.list import ListRecords  # type: ignore
-from src.plugins.actions.generate.delete import DeleteRecords  # type: ignore
+import os
+from src.plugins.actions.generate import Generate
+# from src.plugins.actions.populate import Populate
+# from src.plugins.actions.list import ListRecords
+# from src.plugins.actions.delete import DeleteRecords
 
 
 # commands functions
 def generate(args):
-    macAddr = Generate(args.hostname, args.vendor, args.database, args.table)
+    database = "./mac.db"
+    os.path.abspath(database)
+    macAddr = Generate(args.hostname, database, args.vendor, args.table)
     print(macAddr.get_macAddr())
     if not args.noinsert:
         macAddr.insert(macAddr.get_table())
+        macAddr.get_cur().close()
+        macAddr.commit()
+    else:
+        macAddr.get_cur().close()
+    macAddr.close()
 
 
 # argparse
@@ -30,7 +38,7 @@ parser.add_argument('-v', '--version', action='version', version='%(prog)s 0.1')
 subparsers = parser.add_subparsers(help='sub-command --help')
 
 # populate database(s)
-parser_populate = subparsers.add_parser('populate',
+parser_populate = subparsers.add_parser('populate', aliases=['pop'],
                                         help='populate database(s)'
                                         )
 parser_populate.add_argument('table', type=str, choices=tablesAll,
@@ -39,7 +47,7 @@ parser_populate.add_argument('table', type=str, choices=tablesAll,
                              )
 
 # generate MAC address
-parser_generate = subparsers.add_parser('generate',
+parser_generate = subparsers.add_parser('generate', aliases=['gen'],
                                         help='generate a new MAC address'
                                         )
 parser_generate.add_argument('--vendor', type=str, choices=macAddrVendor,
@@ -75,7 +83,7 @@ parser_list.add_argument('-H', '--hostname', type=str,
                          )
 
 # delete
-parser_delete = subparsers.add_parser('delete',
+parser_delete = subparsers.add_parser('delete', aliases=['del'],
                                       help='delete record(s)'
                                       )
 parser_delete.add_argument('-m', '--mac', type=str,
@@ -92,4 +100,5 @@ parser_delete.add_argument('-H', '--hostname', type=str,
 
 # parse args
 args = parser.parse_args()
+print(args)
 args.func(args)

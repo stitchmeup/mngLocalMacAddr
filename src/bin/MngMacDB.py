@@ -2,10 +2,13 @@
 # SELECT, INSERT, DELETE
 
 import sqlite3
-from GenMacAddr import GenMacAddr  # type: ignore
+import os
 import re
+from src.bin.GenMacAddr import GenMacAddr
 
 
+# TODO: properly close database
+# TODO: commit();
 class MngMacDB(sqlite3.Connection):
     """
     Management of Mac Addresses Database
@@ -13,8 +16,8 @@ class MngMacDB(sqlite3.Connection):
     """
 
     def __init__(self, database):
-        super().__init__(database)
-        self._database = database
+        super().__init__(os.path.abspath(database))
+        self._database = os.path.abspath(database)
         self._cur = self.cursor()
         # % Matches any in SQL WHERE condition
         self._macAddr = '%'
@@ -50,8 +53,8 @@ class MngMacDB(sqlite3.Connection):
     def set_database(self, database):
         " Connect to a new database and set a new cursor "
         self.close()
-        super().__init__(database)
-        self._database = database
+        super().__init__(os.path.abspath(database))
+        self._database = os.path.abspath(database)
         self._cur = self.cursor()
         self.set_tables()
 
@@ -233,8 +236,8 @@ class MngMacDB(sqlite3.Connection):
         Determine if mac Addr is already known in specified tables
         tables must be a list of string.
         """
-        for table in self.tables:
-            if self.mngMacDB.select(table):
+        for table in self.get_tables():
+            if self.select(table):
                 return False
         return True
 

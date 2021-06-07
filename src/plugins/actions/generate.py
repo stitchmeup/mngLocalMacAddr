@@ -1,7 +1,5 @@
-import sys
-sys.path.insert(0, '../../bin/')
-from MngMacDB import MngMacDB  # type: ignore
-from GenMacAddr import GenMacAddr  # type: ignore
+from src.bin.MngMacDB import MngMacDB
+from src.bin.GenMacAddr import GenMacAddr
 
 
 class Generate(MngMacDB):
@@ -11,9 +9,9 @@ class Generate(MngMacDB):
 
     def __init__(self,
                  hostname,
+                 database,
                  vendor="laa",
-                 database="../../mac.db",
-                 table="generic"
+                 table="generic",
                  ):
         super().__init__(database)
         self.set_macAddr(GenMacAddr(vendor))
@@ -23,14 +21,14 @@ class Generate(MngMacDB):
         self.set_hostname(hostname)
         self.table = table
 
-        def get_vendor(self):
-            return self.vendor
+    def get_vendor(self):
+        return self.vendor
 
-        def get_table(self):
-            return self.table
+    def get_table(self):
+        return self.table
 
-        def set_vendor(self, vendor):
-            self.vendor = vendor
+    def set_vendor(self, vendor):
+        self.vendor = vendor
 
-        def set_table(self, table):
-            self.table = table
+    def set_table(self, table):
+        self.table = table
