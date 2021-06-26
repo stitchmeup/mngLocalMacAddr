@@ -32,17 +32,6 @@ class GenMacAddr:
         if vendor is not None:
             self._generate()
 
-    def get_vendor(self):
-        return self.vendor
-
-    def get_addr(self):
-        """
-        Return the _addr object that contains two properties:
-        - vendorId: list of the 3 most significant bytes of MAC address;
-        - serialId: list of the 3 least significant bytes.
-        """
-        return self._addr
-
     def get_vendorId(self):
         """ Get vendor Id """
         return self._addr['vendorId']
@@ -55,9 +44,6 @@ class GenMacAddr:
     def get_specialVendorId(cls):
         """ Get dict of special known vendors ID """
         return cls._specialVendorId
-
-    def set_vendor(self, vendor):
-        self.vendor = vendor
 
     def set_addr(self, addr):
         """
@@ -178,18 +164,3 @@ class GenMacAddr:
         """
         p = re.compile("^[0-9A-Z]{2}(.?[0-9A-Z]{2}){5}$", re.IGNORECASE)
         return p.match(macAsStr)
-
-
-if __name__ == '__main__':
-    """
-    strng = GenMacAddr().toString()
-    macaddr = GenMacAddr.toMacAddr(strng).toString()
-    # true
-    print(strng == macaddr)
-    emptyMac = GenMacAddr(None)
-    # true
-    print(emptyMac.isEmpty())
-    emptyMac.set_vendorId([1, 1, 1])
-    # true
-    print(emptyMac.isEmpty())
-    """

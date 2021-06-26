@@ -7,8 +7,6 @@ import re
 from src.bin.GenMacAddr import GenMacAddr
 
 
-# TODO: properly close database
-# TODO: commit();
 class MngMacDB(sqlite3.Connection):
     """
     Management of Mac Addresses Database
@@ -31,9 +29,6 @@ class MngMacDB(sqlite3.Connection):
 
     def get_database(self):
         return self._database
-
-    def get_cur(self):
-        return self._cur
 
     def get_macAddr(self):
         return self._macAddr
@@ -58,7 +53,7 @@ class MngMacDB(sqlite3.Connection):
         self._cur = self.cursor()
         self.set_tables()
 
-    def set_macAddr(self, mac, patternMode=False):
+    def set_macAddr(self, mac=None, patternMode=False):
         """
         Set mac from a GenMacAddr instance
         if None:
@@ -250,64 +245,3 @@ class MngMacDB(sqlite3.Connection):
             hostname = hostname[:-1]
         allowed = re.compile("(?!-)[A-Z0-9-]{1,63}(?<!-)$", re.IGNORECASE)
         return all(allowed.match(x) for x in hostname.split("."))
-
-
-if __name__ == '__main__':
-    """
-    mngMacDB = MngMacDB('mac.db')
-    print(mngMacDB.get_tables())
-    # ['vbox', 'any']
-
-    print(mngMacDB.tableExist('any'))
-    # True
-
-    print(mngMacDB.select('any'))
-    # dump table any
-
-    mngMacDB.set_database('mac.db')
-    print(mngMacDB.get_database())
-    # mac.db
-
-    macAddr = GenMacAddr(None)
-    macAddr.set_addr({
-        "vendorId": [0x32, 0x5D, 0xB9],
-        "serialId": [0x49, 0x1B, 0x5E]
-    })
-    mngMacDB.set_macAddr(macAddr)
-    print(mngMacDB.select('any'))
-    # [('325DB9491B5E', 'host1')]
-
-    mngMacDB.set_macAddr(None)
-    mngMacDB.set_hostname('host-2')
-    print(mngMacDB.select('any'))
-    # [('2A523B85189F', 'host-2' ), ('86A1EC0CB254', 'host-2')]
-
-    mngMacDB.set_hostname('host%', True)
-    print(mngMacDB.select('any'))
-    # [('325DB9491B5E', 'host1'), ('2A523B85189F', 'host-2'),
-    # ('86A1EC0CB254', 'host-2')]
-
-    try:
-        mngMacDB.insert('any')
-    except ValueError as e:
-        print(e)
-    # Invalid query. mac or hostname is pattern.
-
-    print(mngMacDB.select('any'))
-    # [('325DB9491B5E', 'host1'), ('2A523B85189F', 'host-2'),
-    # ('86A1EC0CB254', 'host-2')]
-
-    mngMacDB.set_hostname('hostToDelete', False)
-    macAddr.set_vendorId([0x12, 0x15, 0x5A])
-    mngMacDB.set_macAddr(macAddr, False)
-    mngMacDB.insert('any')
-    # {'mac': '12155A491B5E', 'hostname': 'hostToDelete'}
-
-    print(mngMacDB.select('any'))
-    # [('12155A491B5E', 'hostToDelete')]
-
-    mngMacDB.delete('any')
-
-    print(mngMacDB.select('any'))
-    # []
-    """
