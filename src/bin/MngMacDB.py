@@ -7,8 +7,6 @@ import re
 from src.bin.GenMacAddr import GenMacAddr
 
 
-# TODO: properly close database
-# TODO: commit();
 class MngMacDB(sqlite3.Connection):
     """
     Management of Mac Addresses Database
@@ -31,9 +29,6 @@ class MngMacDB(sqlite3.Connection):
 
     def get_database(self):
         return self._database
-
-    def get_cur(self):
-        return self._cur
 
     def get_macAddr(self):
         return self._macAddr
@@ -58,7 +53,7 @@ class MngMacDB(sqlite3.Connection):
         self._cur = self.cursor()
         self.set_tables()
 
-    def set_macAddr(self, mac, patternMode=False):
+    def set_macAddr(self, mac=None, patternMode=False):
         """
         Set mac from a GenMacAddr instance
         if None:
