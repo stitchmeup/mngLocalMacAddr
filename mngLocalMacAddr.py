@@ -14,14 +14,15 @@ from src.plugins.actions.generate import Generate
 def generate(args):
     database = "./mac.db"
     os.path.abspath(database)
-    macAddr = Generate(args.hostname, database, args.vendor, args.table)
+    options = {}
+    if args.vendor:
+        options = {**{'vendor': args.vendor}}
+    if args.table:
+        options = {**options, **{'table': args.table}}
+    macAddr = Generate(args.hostname, database, **options)
     print(macAddr.get_macAddr())
     if not args.noinsert:
-        macAddr.insert(macAddr.get_table())
-        macAddr.get_cur().close()
-        macAddr.commit()
-    else:
-        macAddr.get_cur().close()
+        macAddr.insertion()
     macAddr.close()
 
 
