@@ -7,28 +7,26 @@ class Generate(MngMacDB):
     generate a random MAC for CLI tool use
     """
 
-    def __init__(self,
-                 hostname,
-                 database,
-                 vendor="laa",
-                 table="generic",
-                 ):
+    def __init__(self, hostname, database, **options):
+        defaultOptions = {'vendor': "laa", 'table': "generic"}
+        options = {**defaultOptions, **options}
         super().__init__(database)
-        self.set_macAddr(GenMacAddr(vendor))
-        while not self.isMacUniq():
-            self.set_macAddr(GenMacAddr(vendor))
-        self.vendor = vendor
+        self.vendor = options['vendor']
+        self.set_macAddr()
         self.set_hostname(hostname)
-        self.table = table
+        self.table = options['table']
 
-    def get_vendor(self):
-        return self.vendor
+    def set_macAddr(self):
+        """
+        Set mac from a GenMacAddr instance
+        Randomly generated and unique in Database
+        """
+        self._patternModes["mac"] = False
+        self._macAddr = GenMacAddr(self.vendor).toString()
+        while not self.isMacUniq():
+            self._macAddr = GenMacAddr(self.vendor).toString()
 
-    def get_table(self):
-        return self.table
-
-    def set_vendor(self, vendor):
-        self.vendor = vendor
-
-    def set_table(self, table):
-        self.table = table
+    def insertion(self):
+        self.insert(self.table)
+        self.commit()
+        print("inserted into database.")
