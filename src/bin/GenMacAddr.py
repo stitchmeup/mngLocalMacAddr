@@ -158,9 +158,13 @@ class GenMacAddr:
         """
         Check validity mac address as a string
         Must be of form:
+        XXXXXXXXXXXXX
+        so without separator
+        Comments under are irrelevant but kept as it could be useful:
+        Must be of form:
         XXXXXXXXXXXXX, XXyXXyXXyXXyXXyXX, XXyXXXXXXyXXXX, XXXXXXXXXXyXXXX,...
         with X an hexadecimal number and y a character
-        regex used: ^[0-9A-Z]{2}(.?[0-9A-Z]{2}){5}$
+        regex used: ^[0-9A-F]{2}(.?[0-9A-F]{2}){5}$
         """
-        p = re.compile("^[0-9A-Z]{2}(.?[0-9A-Z]{2}){5}$", re.IGNORECASE)
+        p = re.compile("^[0-9A-F]{12}$", re.IGNORECASE)
         return p.match(macAsStr)

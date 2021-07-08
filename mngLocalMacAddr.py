@@ -5,25 +5,10 @@
 import argparse
 import os
 from src.plugins.actions.generate import Generate
+from src.plugins.actions.list import ListInDB
 # from src.plugins.actions.populate import Populate
 # from src.plugins.actions.list import ListRecords
 # from src.plugins.actions.delete import DeleteRecords
-
-
-# commands functions
-def generate(args):
-    database = "./mac.db"
-    os.path.abspath(database)
-    options = {}
-    if args.vendor:
-        options = {**{'vendor': args.vendor}}
-    if args.table:
-        options = {**options, **{'table': args.table}}
-    macAddr = Generate(args.hostname, database, **options)
-    print(macAddr.get_macAddr())
-    if not args.noinsert:
-        macAddr.insertion()
-    macAddr.close()
 
 
 # argparse
@@ -31,6 +16,37 @@ tablesList = ['generic']
 tablesAll = tablesList.copy()
 tablesAll.append('all')
 macAddrVendor = ['laa', 'vbox']
+# TODO: check for redundancy with MngMacDB class about os.path.abspath
+database = os.path.abspath("./mac.db")
+
+
+# commands functions
+def generate(args):
+    options = {}
+    if args.vendor:
+        options = {**{'vendor': args.vendor}}
+    if args.table:
+        options = {**options, **{'table': args.table}}
+    macAddr = Generate(database, args.hostname, **options)
+    print(macAddr.get_macAddr())
+    if not args.noinsert:
+        macAddr.insertion()
+    macAddr.close()
+
+
+def list(args):
+    options = {}
+    if args.mac:
+        options = {**{'macAddr': args.mac}}
+    if args.hostname:
+        options = {**options, **{'hostname': args.hostname}}
+    listInDB = ListInDB(database, args.table, **options)
+    found = listInDB.selection()
+    for table in found:
+        # TODO formating output
+        print(table, found[table])
+    listInDB.close()
+
 
 # TODO: description
 parser = argparse.ArgumentParser(description="TBD")
@@ -73,15 +89,16 @@ parser_list = subparsers.add_parser('list',
                                     help='list known MAC addresses'
                                     )
 parser_list.add_argument('-m', '--mac', type=str,
-                         help='mac address to look for'
+                         help='mac address to look for (SQL pattern matching enabled)'
                          )
 parser_list.add_argument('-T', '--table', type=str, choices=tablesAll,
                          default='all',
                          help='table to look into (default: all)'
                          )
 parser_list.add_argument('-H', '--hostname', type=str,
-                         help='hostname to look for'
+                         help='hostname to look for (SQL pattern matching enabled)'
                          )
+parser_list.set_defaults(func=list)
 
 # delete
 parser_delete = subparsers.add_parser('delete', aliases=['del'],

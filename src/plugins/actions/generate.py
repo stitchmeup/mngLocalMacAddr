@@ -7,7 +7,7 @@ class Generate(MngMacDB):
     generate a random MAC for CLI tool use
     """
 
-    def __init__(self, hostname, database, **options):
+    def __init__(self, database, hostname, **options):
         defaultOptions = {'vendor': "laa", 'table': "generic"}
         options = {**defaultOptions, **options}
         super().__init__(database)
