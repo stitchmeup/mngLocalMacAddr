@@ -4,8 +4,10 @@
 
 import argparse
 import os
+from src.plugins.actions.delete import DeleteInDB
 from src.plugins.actions.generate import Generate
 from src.plugins.actions.list import ListInDB
+from src.plugins.actions.populate import Populate
 # from src.plugins.actions.populate import Populate
 # from src.plugins.actions.list import ListRecords
 # from src.plugins.actions.delete import DeleteRecords
@@ -46,6 +48,17 @@ def list(args):
         # TODO formating output
         print(table, found[table])
     listInDB.close()
+
+
+def delete(args):
+    options = {}
+    if args.mac:
+        options = {**{'macAddr': args.mac}}
+    if args.hostname:
+        options = {**options, **{'hostname': args.hostname}}
+    deleteInDB = DeleteInDB(database, args.table, **options)
+    deleteInDB.deletion()
+    deleteInDB.close()
 
 
 # TODO: description
@@ -114,6 +127,7 @@ parser_delete.add_argument('-T', '--table', type=str, choices=tablesAll,
 parser_delete.add_argument('-H', '--hostname', type=str,
                            help='hostname to delete'
                            )
+parser_delete.set_defaults(func=delete)
 
 
 # parse args

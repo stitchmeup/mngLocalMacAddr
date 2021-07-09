@@ -117,7 +117,7 @@ class MngMacDB(sqlite3.Connection):
     def set_safeQuery(self, isSafe=True):
         """
         Enable safe mode query (default True):
-        Can only do INSERT INTO and UPDATE with non pattern mac and/or hostname
+        Can only do INSERT INTO, UPDATE and DELETE with non pattern mac and/or hostname
         Without arg, set it to True
         """
         if type(isSafe) is bool:
