@@ -1,5 +1,5 @@
-from src.bin.MngMacDB import MngMacDB
-from src.bin.GenMacAddr import GenMacAddr
+from src.lib.MngMacDB import MngMacDB
+from src.lib.GenMacAddr import GenMacAddr
 
 
 class Generate(MngMacDB):
@@ -7,7 +7,7 @@ class Generate(MngMacDB):
     generate a random MAC for CLI tool use
     """
 
-    def __init__(self, hostname, database, **options):
+    def __init__(self, database, hostname, **options):
         defaultOptions = {'vendor': "laa", 'table': "generic"}
         options = {**defaultOptions, **options}
         super().__init__(database)
