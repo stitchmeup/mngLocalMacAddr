@@ -1,4 +1,4 @@
-from src.bin.MngMacDB import MngMacDB
+from src.lib.MngMacDB import MngMacDB
 
 
 class DeleteInDB(MngMacDB):
