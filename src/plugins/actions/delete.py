@@ -1,4 +1,4 @@
-from src.lib.MngMacDB import MngMacDB
+from src.lib.MngMacDB import MngMacDB  # type: ignore
 
 
 class DeleteInDB(MngMacDB):
@@ -15,6 +15,7 @@ class DeleteInDB(MngMacDB):
         self.table = table
         self.set_safeQuery(False)
 
+    # TODO deletion on DB
     def deletion(self):
         if self.table == 'all':
             res = {}

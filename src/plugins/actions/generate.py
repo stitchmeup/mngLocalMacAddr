@@ -1,5 +1,5 @@
-from src.lib.MngMacDB import MngMacDB
-from src.lib.GenMacAddr import GenMacAddr
+from src.lib.MngMacDB import MngMacDB  # type: ignore
+from src.lib.GenMacAddr import GenMacAddr  # type: ignore
 
 
 class Generate(MngMacDB):

@@ -4,15 +4,10 @@
 
 import argparse
 import os
-from src.plugins.actions.delete import DeleteInDB
-from src.plugins.actions.generate import Generate
-from src.plugins.actions.list import ListInDB
-from src.plugins.actions.populate import Populate
-# from src.plugins.actions.populate import Populate
-# from src.plugins.actions.list import ListRecords
-# from src.plugins.actions.delete import DeleteRecords
-
-
+from src.plugins.actions.delete import DeleteInDB  # type: ignore
+from src.plugins.actions.generate import Generate  # type: ignore
+from src.plugins.actions.list import ListInDB  # type: ignore
+from src.plugins.actions.populate import Populate   # type: ignore
 # argparse
 tablesList = ['generic']
 tablesAll = tablesList.copy()

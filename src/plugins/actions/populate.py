@@ -1,5 +1,6 @@
 from src.lib.MngMacDB import MngMacDB
 
+
 class Populate(MngMacDB):
     """
     Populate the database with current used MAC addresses

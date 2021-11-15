@@ -4,7 +4,7 @@
 import sqlite3
 import os
 import re
-from src.lib.GenMacAddr import GenMacAddr
+from src.lib.GenMacAddr import GenMacAddr  # type: ignore
 
 
 class MngMacDB(sqlite3.Connection):

@@ -1,4 +1,6 @@
-from src.lib.MngMacDB import MngMacDB
+from src.lib.MngMacDB import MngMacDB  # type: ignore
+
+# TODO : Format list output
 
 
 class ListInDB(MngMacDB):
