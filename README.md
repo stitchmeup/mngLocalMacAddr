@@ -1,4 +1,5 @@
 # mngLocalMacAddr
 Manage and Generate unique LAA and VirtualBox Mac Address
 
-Still in developpement
+Developpement ON HOLD.  
+No time to developp, no time to build lab for fun and educating purposes :(
